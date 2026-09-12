@@ -4,6 +4,14 @@ const KEYS = {
   BODY_LOG: '@fit/bodylog',
   WORKOUT_LOG: '@fit/workoutlog',
   ROUTINES: '@fit/routines',
+  PROFILE: '@fit/profile',
+};
+
+export const DEFAULT_PROFILE = {
+  name: 'Johan',
+  metaPeso: null,
+  unidades: 'kg',
+  restSeconds: 90,
 };
 
 async function getJSON(key, fallback) {
@@ -38,4 +46,9 @@ export const WorkoutLog = {
 export const Routines = {
   get: (seed) => getJSON(KEYS.ROUTINES, seed),
   save: (routines) => setJSON(KEYS.ROUTINES, routines),
+};
+
+export const Profile = {
+  get: () => getJSON(KEYS.PROFILE, DEFAULT_PROFILE),
+  save: (profile) => setJSON(KEYS.PROFILE, profile),
 };

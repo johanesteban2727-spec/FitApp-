@@ -13,6 +13,7 @@ const ICONS = {
   Progreso: 'stats-chart',
   Rutinas: 'barbell',
   Nutricion: 'scan',
+  Perfil: 'person-circle',
 };
 
 function TabButton({ route, isFocused, onPress }) {

@@ -11,6 +11,7 @@ import { SpaceMono_400Regular, SpaceMono_700Bold } from '@expo-google-fonts/spac
 import ProgresoScreen from './src/screens/ProgresoScreen';
 import RutinasScreen from './src/screens/RutinasScreen';
 import NutricionScreen from './src/screens/NutricionScreen';
+import PerfilScreen from './src/screens/PerfilScreen';
 import TabBar from './src/components/TabBar';
 import { colors } from './src/theme';
 
@@ -43,6 +44,7 @@ export default function App() {
         <Tab.Screen name="Progreso" component={ProgresoScreen} />
         <Tab.Screen name="Rutinas" component={RutinasScreen} />
         <Tab.Screen name="Nutricion" component={NutricionScreen} />
+        <Tab.Screen name="Perfil" component={PerfilScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );

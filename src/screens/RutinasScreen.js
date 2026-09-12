@@ -5,10 +5,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { Routines, WorkoutLog } from '../storage/storage';
+import { Routines, WorkoutLog, Profile, DEFAULT_PROFILE } from '../storage/storage';
 import { DEFAULT_ROUTINES } from '../data/defaultRoutines';
 import { ROUTINE_IMAGES, EXERCISE_IMAGES, EXERCISE_VIDEOS } from '../data/media';
 import MediaBox from '../components/MediaBox';
+import RestTimer from '../components/RestTimer';
 import { colors, radius, spacing, typography, fonts } from '../theme';
 
 const ACCENTS = [colors.lime, colors.sky, colors.pink, colors.gold, colors.terracotta];
@@ -27,9 +28,11 @@ export default function RutinasScreen() {
   const [logInputs, setLogInputs] = useState({});
   const [newExName, setNewExName] = useState('');
   const [videoModal, setVideoModal] = useState(null);
+  const [profile, setProfile] = useState(DEFAULT_PROFILE);
 
   useEffect(() => {
     Routines.get(DEFAULT_ROUTINES).then(setRoutines);
+    Profile.get().then(setProfile);
   }, []);
 
   const persist = async (updated) => {
@@ -118,6 +121,7 @@ export default function RutinasScreen() {
                   value={logInputs[item.id] || ''}
                   onChangeText={(t) => setLogInputs((prev) => ({ ...prev, [item.id]: t }))}
                 />
+                <RestTimer seconds={profile.restSeconds} />
               </Animated.View>
             );
           }}

@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { BodyLog } from '../storage/storage';
+import { BodyLog, WorkoutLog, Profile, DEFAULT_PROFILE } from '../storage/storage';
 import ProgressRing from '../components/ProgressRing';
+import LineChart from '../components/LineChart';
+import StreakCalendar from '../components/StreakCalendar';
 import { colors, radius, spacing, typography, fonts } from '../theme';
 
 const DAYS = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
@@ -17,11 +20,20 @@ export default function ProgresoScreen() {
   const [arm, setArm] = useState('');
   const [chest, setChest] = useState('');
   const [log, setLog] = useState([]);
+  const [workoutLog, setWorkoutLog] = useState([]);
+  const [profile, setProfile] = useState(DEFAULT_PROFILE);
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     BodyLog.getAll().then((all) => setLog([...all].reverse()));
+    Profile.get().then(setProfile);
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      WorkoutLog.getAll().then(setWorkoutLog);
+    }, [])
+  );
 
   const save = async () => {
     if (!weight) return;
@@ -43,9 +55,13 @@ export default function ProgresoScreen() {
   const first = log[log.length - 1];
   const bmi = last?.weight && last?.height ? (last.weight / ((last.height / 100) ** 2)).toFixed(1) : null;
   const gained = last && first ? (last.weight - first.weight).toFixed(1) : null;
-  const weeklyGoal = 2;
-  const progress = last && first ? Math.min(Math.max((last.weight - first.weight) / weeklyGoal, 0), 1) : 0;
+  const progress = profile.metaPeso && first
+    ? Math.min(Math.max((last.weight - first.weight) / (profile.metaPeso - first.weight), 0), 1)
+    : last && first
+    ? Math.min(Math.max((last.weight - first.weight) / 2, 0), 1)
+    : 0;
   const today = new Date();
+  const weightSeries = [...log].reverse().map((e) => e.weight);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -89,9 +105,20 @@ export default function ProgresoScreen() {
             <Animated.View entering={FadeInDown.delay(160).springify()} style={styles.statsCard}>
               <Stat label="REGISTROS" value={String(log.length)} />
               <View style={styles.divider} />
-              <Stat label="OBJETIVO" value="+0.3" unit="KG/SEM" />
+              <Stat label="META" value={profile.metaPeso ? String(profile.metaPeso) : '--'} unit="KG" />
               <View style={styles.divider} />
               <Stat label="ALTURA" value={last?.height ? String(last.height) : '--'} unit="CM" />
+            </Animated.View>
+
+            <Animated.View entering={FadeInDown.delay(190).springify()} style={styles.chartCard}>
+              <Text style={styles.label}>TENDENCIA DE PESO</Text>
+              <View style={{ marginTop: spacing.md }}>
+                <LineChart data={weightSeries} unit="kg" />
+              </View>
+            </Animated.View>
+
+            <Animated.View entering={FadeInDown.delay(210).springify()} style={{ marginBottom: spacing.lg }}>
+              <StreakCalendar workoutLog={workoutLog} />
             </Animated.View>
 
             {!showForm ? (
@@ -171,7 +198,8 @@ const styles = StyleSheet.create({
   bigStat: { fontFamily: fonts.display, fontSize: 30, color: colors.text, marginTop: spacing.xs },
   bigStatUnit: { fontSize: 14, color: colors.textFaint, fontFamily: undefined },
   smallStat: { color: colors.textDim, fontSize: 12, marginTop: 2 },
-  statsCard: { flexDirection: 'row', backgroundColor: colors.card, borderRadius: radius.lg, padding: spacing.lg, marginBottom: spacing.lg, borderWidth: 1, borderColor: colors.border },
+  statsCard: { flexDirection: 'row', backgroundColor: colors.card, borderRadius: radius.lg, padding: spacing.lg, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.border },
+  chartCard: { backgroundColor: colors.card, borderRadius: radius.lg, padding: spacing.lg, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.border },
   divider: { width: 1, backgroundColor: colors.border, marginHorizontal: spacing.md },
   statValue: { fontFamily: fonts.display, fontSize: 20, color: colors.text, marginTop: spacing.xs },
   statUnit: { fontSize: 10, color: colors.textFaint, fontFamily: fonts.mono },
