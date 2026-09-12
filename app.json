@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "FitApp",
+    "name": "PULSO",
     "slug": "johan725",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.johan.fitapp",
@@ -32,7 +32,8 @@
     "owner": "latino-speak",
     "plugins": [
       "expo-video",
-      "expo-audio"
+      "expo-audio",
+      "expo-font"
     ]
   }
 }

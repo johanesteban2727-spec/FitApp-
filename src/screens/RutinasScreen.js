@@ -9,7 +9,9 @@ import { Routines, WorkoutLog } from '../storage/storage';
 import { DEFAULT_ROUTINES } from '../data/defaultRoutines';
 import { ROUTINE_IMAGES, EXERCISE_IMAGES, EXERCISE_VIDEOS } from '../data/media';
 import MediaBox from '../components/MediaBox';
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, radius, spacing, typography, fonts } from '../theme';
+
+const ACCENTS = [colors.lime, colors.sky, colors.pink, colors.gold, colors.terracotta];
 
 function ExerciseVideoPlayer({ source }) {
   const player = useVideoPlayer(source, (p) => {
@@ -80,8 +82,8 @@ export default function RutinasScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <TouchableOpacity onPress={() => setSelected(null)} style={styles.backRow}>
-          <Ionicons name="chevron-back" size={20} color={colors.primary} />
-          <Text style={styles.back}>Rutinas</Text>
+          <Ionicons name="chevron-back" size={18} color={colors.lime} />
+          <Text style={styles.back}>RUTINAS</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{selected.name}</Text>
 
@@ -91,19 +93,24 @@ export default function RutinasScreen() {
           contentContainerStyle={{ paddingBottom: 140 }}
           renderItem={({ item, index }) => {
             const hasVideo = !!EXERCISE_VIDEOS[item.id];
+            const accent = ACCENTS[index % ACCENTS.length];
             return (
               <Animated.View entering={FadeInDown.delay(index * 40).duration(400)} style={styles.exCard}>
+                <View style={styles.exHeaderRow}>
+                  <Text style={styles.exNum}>{String(index + 1).padStart(2, '0')}</Text>
+                  <View style={[styles.exBar, { backgroundColor: accent }]} />
+                  <TouchableOpacity onLongPress={() => removeExercise(item.id)} style={{ flex: 1 }}>
+                    <Text style={styles.exName}>{item.name}</Text>
+                    <Text style={styles.exMeta}>{item.sets} SERIES · {item.reps}{item.equipo ? `  ·  ${item.equipo}` : ''}</Text>
+                  </TouchableOpacity>
+                </View>
                 <MediaBox source={EXERCISE_IMAGES[item.id]} icon="barbell" style={styles.exImage}>
                   {hasVideo && (
-                    <TouchableOpacity style={styles.playBadge} onPress={() => setVideoModal(EXERCISE_VIDEOS[item.id])}>
-                      <Ionicons name="play" size={14} color="#fff" />
+                    <TouchableOpacity style={[styles.playBadge, { backgroundColor: accent }]} onPress={() => setVideoModal(EXERCISE_VIDEOS[item.id])}>
+                      <Ionicons name="play" size={14} color={colors.bg} />
                     </TouchableOpacity>
                   )}
                 </MediaBox>
-                <TouchableOpacity onLongPress={() => removeExercise(item.id)} style={{ marginTop: spacing.sm }}>
-                  <Text style={styles.exName}>{item.name}</Text>
-                  <Text style={styles.exMeta}>{item.sets} series x {item.reps}{item.equipo ? `  •  ${item.equipo}` : ''}</Text>
-                </TouchableOpacity>
                 <TextInput
                   style={styles.logInput}
                   placeholder="ej: 10x20kg, 10x20kg, 8x22kg"
@@ -124,16 +131,14 @@ export default function RutinasScreen() {
                 onChangeText={setNewExName}
               />
               <TouchableOpacity style={styles.addSmallButton} onPress={addExercise}>
-                <Ionicons name="add" size={22} color="#fff" />
+                <Ionicons name="add" size={22} color={colors.text} />
               </TouchableOpacity>
             </View>
           }
         />
         <Text style={styles.hint}>Manten presionado un ejercicio para borrarlo. Toca el video para ver la tecnica.</Text>
         <TouchableOpacity style={styles.saveWorkout} onPress={saveWorkout} activeOpacity={0.85}>
-          <LinearGradient colors={colors.gradientPrimary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.saveWorkoutGradient}>
-            <Text style={styles.saveWorkoutText}>Guardar entrenamiento de hoy</Text>
-          </LinearGradient>
+          <Text style={styles.saveWorkoutText}>GUARDAR ENTRENAMIENTO DE HOY</Text>
         </TouchableOpacity>
 
         <Modal visible={!!videoModal} transparent animationType="fade" onRequestClose={() => setVideoModal(null)}>
@@ -156,7 +161,7 @@ export default function RutinasScreen() {
         contentContainerStyle={{ paddingBottom: 140 }}
         ListHeaderComponent={
           <Animated.View entering={FadeIn.duration(500)}>
-            <Text style={styles.greeting}>Entrenamiento</Text>
+            <Text style={styles.label}>ENTRENAMIENTO DE HOY</Text>
             <Text style={styles.title}>Elige tu rutina</Text>
           </Animated.View>
         }
@@ -168,8 +173,8 @@ export default function RutinasScreen() {
                 <View style={styles.routineOverlay}>
                   <Text style={styles.routineName}>{item.name}</Text>
                   <View style={styles.routineMetaRow}>
-                    <Ionicons name="list" size={14} color={colors.textDim} />
-                    <Text style={styles.exMeta}>{item.exercises.length} ejercicios</Text>
+                    <Ionicons name="list" size={12} color={colors.lime} />
+                    <Text style={styles.routineMeta}>{item.exercises.length} EJERCICIOS</Text>
                   </View>
                 </View>
               </MediaBox>
@@ -183,28 +188,31 @@ export default function RutinasScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: spacing.lg },
-  greeting: { ...typography.body, marginTop: spacing.md },
-  title: { ...typography.hero, marginBottom: spacing.lg },
-  backRow: { flexDirection: 'row', alignItems: 'center', marginTop: spacing.md },
-  back: { color: colors.primary, fontSize: 16, fontWeight: '600' },
+  label: { ...typography.labelLime, marginTop: spacing.md },
+  title: { ...typography.hero, fontSize: 30, marginTop: spacing.sm, marginBottom: spacing.lg },
+  backRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: spacing.md },
+  back: { fontFamily: fonts.monoBold, fontSize: 11, letterSpacing: 1, color: colors.lime },
   routineCard: { marginBottom: spacing.lg },
-  routineImage: { height: 160, justifyContent: 'flex-end' },
+  routineImage: { height: 170, justifyContent: 'flex-end', borderRadius: radius.xl },
   routineOverlay: { padding: spacing.lg },
-  routineName: { color: colors.text, fontSize: 20, fontWeight: '800' },
-  routineMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+  routineName: { fontFamily: fonts.display, fontSize: 21, color: colors.text, letterSpacing: -0.5 },
+  routineMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
+  routineMeta: { fontFamily: fonts.mono, fontSize: 10, letterSpacing: 1, color: colors.textDim },
   exCard: { backgroundColor: colors.card, padding: spacing.md, borderRadius: radius.lg, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.border },
+  exHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm },
+  exNum: { fontFamily: fonts.mono, fontSize: 11, color: colors.textFaint },
+  exBar: { width: 4, height: 32, borderRadius: radius.full },
   exImage: { height: 140 },
-  playBadge: { position: 'absolute', top: spacing.sm, right: spacing.sm, width: 32, height: 32, borderRadius: radius.full, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  exName: { color: colors.text, fontSize: 16, fontWeight: '700' },
-  exMeta: { ...typography.caption, marginTop: 2 },
+  playBadge: { position: 'absolute', top: spacing.sm, right: spacing.sm, width: 32, height: 32, borderRadius: radius.full, alignItems: 'center', justifyContent: 'center' },
+  exName: { color: colors.text, fontFamily: fonts.displayMedium, fontSize: 16 },
+  exMeta: { fontFamily: fonts.mono, fontSize: 9, letterSpacing: 0.8, color: colors.textFaint, marginTop: 3 },
   logInput: { backgroundColor: colors.cardAlt, color: colors.text, padding: 10, borderRadius: radius.sm, marginTop: spacing.sm },
   addRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm, alignItems: 'center' },
   input: { backgroundColor: colors.card, color: colors.text, padding: 12, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border },
   addSmallButton: { backgroundColor: colors.cardAlt, width: 46, height: 46, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.border },
-  hint: { ...typography.caption, marginVertical: spacing.sm, textAlign: 'center' },
-  saveWorkout: { borderRadius: radius.lg, overflow: 'hidden' },
-  saveWorkoutGradient: { padding: 16, alignItems: 'center' },
-  saveWorkoutText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  hint: { ...typography.label, marginVertical: spacing.sm, textAlign: 'center', textTransform: 'none' },
+  saveWorkout: { backgroundColor: colors.lime, borderRadius: radius.full, paddingVertical: 16, alignItems: 'center' },
+  saveWorkoutText: { fontFamily: fonts.monoBold, fontSize: 11, letterSpacing: 1, color: colors.bg },
   modalBg: { flex: 1, backgroundColor: '#000000ee', alignItems: 'center', justifyContent: 'center' },
   modalClose: { position: 'absolute', top: 60, right: 24, zIndex: 10 },
   video: { width: '100%', height: 300 },

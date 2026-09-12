@@ -1,6 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View } from 'react-native';
+import {
+  useFonts,
+  SpaceGrotesk_500Medium,
+  SpaceGrotesk_700Bold,
+} from '@expo-google-fonts/space-grotesk';
+import { SpaceMono_400Regular, SpaceMono_700Bold } from '@expo-google-fonts/space-mono';
 import ProgresoScreen from './src/screens/ProgresoScreen';
 import RutinasScreen from './src/screens/RutinasScreen';
 import NutricionScreen from './src/screens/NutricionScreen';
@@ -15,6 +22,17 @@ const navTheme = {
 };
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    SpaceGrotesk_500Medium,
+    SpaceGrotesk_700Bold,
+    SpaceMono_400Regular,
+    SpaceMono_700Bold,
+  });
+
+  if (!fontsLoaded) {
+    return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
+  }
+
   return (
     <NavigationContainer theme={navTheme}>
       <StatusBar style="light" />

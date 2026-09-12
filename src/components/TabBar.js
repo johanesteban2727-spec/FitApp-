@@ -7,19 +7,19 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { colors, radius } from '../theme';
+import { colors, radius, fonts } from '../theme';
 
 const ICONS = {
-  Progreso: 'trending-up',
+  Progreso: 'stats-chart',
   Rutinas: 'barbell',
-  Nutricion: 'restaurant',
+  Nutricion: 'scan',
 };
 
 function TabButton({ route, isFocused, onPress }) {
-  const scale = useSharedValue(isFocused ? 1 : 0.9);
+  const scale = useSharedValue(isFocused ? 1 : 0.94);
 
   useEffect(() => {
-    scale.value = withSpring(isFocused ? 1 : 0.9, { damping: 14, stiffness: 180 });
+    scale.value = withSpring(isFocused ? 1 : 0.94, { damping: 14, stiffness: 180 });
   }, [isFocused]);
 
   const style = useAnimatedStyle(() => ({
@@ -31,8 +31,8 @@ function TabButton({ route, isFocused, onPress }) {
       <Animated.View style={[styles.tabInner, isFocused && styles.tabInnerActive, style]}>
         <Ionicons
           name={ICONS[route.name]}
-          size={20}
-          color={isFocused ? colors.text : colors.textFaint}
+          size={18}
+          color={isFocused ? colors.bg : colors.textFaint}
         />
         {isFocused && <Text style={styles.tabLabel}>{route.name}</Text>}
       </Animated.View>
@@ -43,7 +43,7 @@ function TabButton({ route, isFocused, onPress }) {
 export default function TabBar({ state, navigation }) {
   return (
     <View style={styles.wrapper}>
-      <BlurView intensity={40} tint="dark" style={styles.blur}>
+      <BlurView intensity={50} tint="dark" style={styles.blur}>
         <View style={styles.row}>
           {state.routes.map((route, index) => {
             const isFocused = state.index === index;
@@ -65,15 +65,15 @@ export default function TabBar({ state, navigation }) {
 const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
-    left: 16,
-    right: 16,
-    bottom: 24,
-    borderRadius: radius.full,
+    left: 12,
+    right: 12,
+    bottom: 20,
+    borderRadius: radius.xl,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: colors.border,
   },
-  blur: { paddingVertical: 8, paddingHorizontal: 8 },
+  blur: { paddingVertical: 6, paddingHorizontal: 6, backgroundColor: 'rgba(27,29,25,0.9)' },
   row: { flexDirection: 'row', justifyContent: 'space-between' },
   tab: { flex: 1 },
   tabInner: {
@@ -81,9 +81,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    paddingVertical: 10,
-    borderRadius: radius.full,
+    paddingVertical: 12,
+    borderRadius: radius.lg,
   },
-  tabInnerActive: { backgroundColor: colors.primary },
-  tabLabel: { color: colors.text, fontWeight: '700', fontSize: 13 },
+  tabInnerActive: { backgroundColor: colors.lime },
+  tabLabel: { color: colors.bg, fontFamily: fonts.monoBold, fontSize: 10, letterSpacing: 0.5 },
 });
