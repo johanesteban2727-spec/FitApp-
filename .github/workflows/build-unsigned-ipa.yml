@@ -23,7 +23,7 @@ jobs:
         id: scheme
         run: |
           cd ios
-          SCHEME=$(xcodebuild -list -json | node -e "const d=JSON.parse(require('fs').readFileSync(0));console.log(d.project.schemes[0])")
+          SCHEME=$(basename "$(ls -d *.xcworkspace)" .xcworkspace)
           echo "name=$SCHEME" >> "$GITHUB_OUTPUT"
 
       - name: Archive (unsigned)
@@ -32,6 +32,8 @@ jobs:
           xcodebuild archive \
             -workspace *.xcworkspace \
             -scheme "${{ steps.scheme.outputs.name }}" \
+            -skipPackagePluginValidation \
+            -skipMacroValidation \
             -sdk iphoneos \
             -configuration Release \
             -archivePath build/App.xcarchive \
