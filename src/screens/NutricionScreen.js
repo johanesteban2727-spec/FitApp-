@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Audio } from 'expo-av';
+import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { MEALS, NUTRITION_TIPS } from '../data/meals';
@@ -10,21 +10,33 @@ import { MEAL_IMAGES, VOICE_CLIPS } from '../data/media';
 import MediaBox from '../components/MediaBox';
 import { colors, radius, spacing, typography } from '../theme';
 
-const TIP_VOICES = [VOICE_CLIPS.tip1, VOICE_CLIPS.tip2, VOICE_CLIPS.tip3, VOICE_CLIPS.tip4, VOICE_CLIPS.tip5];
-
 export default function NutricionScreen() {
   const [playingIndex, setPlayingIndex] = useState(null);
 
-  const playTip = async (index) => {
+  const p1 = useAudioPlayer(VOICE_CLIPS.tip1);
+  const p2 = useAudioPlayer(VOICE_CLIPS.tip2);
+  const p3 = useAudioPlayer(VOICE_CLIPS.tip3);
+  const p4 = useAudioPlayer(VOICE_CLIPS.tip4);
+  const p5 = useAudioPlayer(VOICE_CLIPS.tip5);
+  const players = [p1, p2, p3, p4, p5];
+  const s1 = useAudioPlayerStatus(p1);
+  const s2 = useAudioPlayerStatus(p2);
+  const s3 = useAudioPlayerStatus(p3);
+  const s4 = useAudioPlayerStatus(p4);
+  const s5 = useAudioPlayerStatus(p5);
+  const statuses = [s1, s2, s3, s4, s5];
+
+  useEffect(() => {
+    if (playingIndex !== null && statuses[playingIndex]?.didJustFinish) {
+      setPlayingIndex(null);
+    }
+  }, [statuses[playingIndex ?? 0]?.didJustFinish]);
+
+  const playTip = (index) => {
+    players.forEach((p, i) => (i !== index ? p.pause() : null));
+    players[index].seekTo(0);
+    players[index].play();
     setPlayingIndex(index);
-    const { sound } = await Audio.Sound.createAsync(TIP_VOICES[index]);
-    sound.setOnPlaybackStatusUpdate((status) => {
-      if (status.didJustFinish) {
-        setPlayingIndex(null);
-        sound.unloadAsync();
-      }
-    });
-    await sound.playAsync();
   };
 
   return (

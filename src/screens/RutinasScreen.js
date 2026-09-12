@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Video, ResizeMode } from 'expo-av';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { Routines, WorkoutLog } from '../storage/storage';
@@ -10,6 +10,14 @@ import { DEFAULT_ROUTINES } from '../data/defaultRoutines';
 import { ROUTINE_IMAGES, EXERCISE_IMAGES, EXERCISE_VIDEOS } from '../data/media';
 import MediaBox from '../components/MediaBox';
 import { colors, radius, spacing, typography } from '../theme';
+
+function ExerciseVideoPlayer({ source }) {
+  const player = useVideoPlayer(source, (p) => {
+    p.loop = true;
+    p.play();
+  });
+  return <VideoView style={styles.video} player={player} nativeControls allowsFullscreen contentFit="contain" />;
+}
 
 export default function RutinasScreen() {
   const [routines, setRoutines] = useState([]);
@@ -133,16 +141,7 @@ export default function RutinasScreen() {
             <TouchableOpacity style={styles.modalClose} onPress={() => setVideoModal(null)}>
               <Ionicons name="close" size={28} color="#fff" />
             </TouchableOpacity>
-            {videoModal && (
-              <Video
-                source={videoModal}
-                style={styles.video}
-                useNativeControls
-                resizeMode={ResizeMode.CONTAIN}
-                shouldPlay
-                isLooping
-              />
-            )}
+            {videoModal && <ExerciseVideoPlayer key={videoModal} source={videoModal} />}
           </View>
         </Modal>
       </SafeAreaView>

@@ -29,6 +29,10 @@
         "projectId": "2a6b729e-b808-49f1-919a-934d901cbf27"
       }
     },
-    "owner": "latino-speak"
+    "owner": "latino-speak",
+    "plugins": [
+      "expo-video",
+      "expo-audio"
+    ]
   }
 }
