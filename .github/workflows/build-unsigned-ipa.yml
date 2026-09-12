@@ -17,7 +17,10 @@ jobs:
         run: npm ci
 
       - name: Prebuild native iOS project
-        run: npx expo prebuild --platform ios --no-install
+        run: npx expo prebuild --platform ios
+
+      - name: Install CocoaPods
+        run: cd ios && pod install
 
       - name: Find scheme name
         id: scheme
