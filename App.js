@@ -1,23 +1,26 @@
 import { StatusBar } from 'expo-status-bar';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ProgresoScreen from './src/screens/ProgresoScreen';
 import RutinasScreen from './src/screens/RutinasScreen';
 import NutricionScreen from './src/screens/NutricionScreen';
+import TabBar from './src/components/TabBar';
+import { colors } from './src/theme';
 
 const Tab = createBottomTabNavigator();
 
+const navTheme = {
+  ...DarkTheme,
+  colors: { ...DarkTheme.colors, background: colors.bg, card: colors.bg },
+};
+
 export default function App() {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={navTheme}>
       <StatusBar style="light" />
       <Tab.Navigator
-        screenOptions={{
-          headerShown: false,
-          tabBarStyle: { backgroundColor: '#1b1e26', borderTopColor: '#2a2e38' },
-          tabBarActiveTintColor: '#e0393e',
-          tabBarInactiveTintColor: '#888',
-        }}
+        screenOptions={{ headerShown: false }}
+        tabBar={(props) => <TabBar {...props} />}
       >
         <Tab.Screen name="Progreso" component={ProgresoScreen} />
         <Tab.Screen name="Rutinas" component={RutinasScreen} />
