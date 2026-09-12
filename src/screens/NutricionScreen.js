@@ -1,15 +1,32 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Audio } from 'expo-av';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { MEALS, NUTRITION_TIPS } from '../data/meals';
-import { MEAL_IMAGES } from '../data/media';
+import { MEAL_IMAGES, VOICE_CLIPS } from '../data/media';
 import MediaBox from '../components/MediaBox';
 import { colors, radius, spacing, typography } from '../theme';
 
+const TIP_VOICES = [VOICE_CLIPS.tip1, VOICE_CLIPS.tip2, VOICE_CLIPS.tip3, VOICE_CLIPS.tip4, VOICE_CLIPS.tip5];
+
 export default function NutricionScreen() {
+  const [playingIndex, setPlayingIndex] = useState(null);
+
+  const playTip = async (index) => {
+    setPlayingIndex(index);
+    const { sound } = await Audio.Sound.createAsync(TIP_VOICES[index]);
+    sound.setOnPlaybackStatusUpdate((status) => {
+      if (status.didJustFinish) {
+        setPlayingIndex(null);
+        sound.unloadAsync();
+      }
+    });
+    await sound.playAsync();
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <FlatList
@@ -29,6 +46,13 @@ export default function NutricionScreen() {
                   <View key={i} style={styles.tipRow}>
                     <Ionicons name="checkmark-circle" size={16} color={colors.success} />
                     <Text style={styles.tip}>{t}</Text>
+                    <TouchableOpacity onPress={() => playTip(i)} hitSlop={8}>
+                      <Ionicons
+                        name={playingIndex === i ? 'volume-high' : 'volume-medium-outline'}
+                        size={18}
+                        color={playingIndex === i ? colors.primary : colors.textFaint}
+                      />
+                    </TouchableOpacity>
                   </View>
                 ))}
               </LinearGradient>
