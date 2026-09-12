@@ -1,0 +1,53 @@
+name: Build unsigned iOS ipa
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install JS deps
+        run: npm ci
+
+      - name: Prebuild native iOS project
+        run: npx expo prebuild --platform ios --no-install
+
+      - name: Find scheme name
+        id: scheme
+        run: |
+          cd ios
+          SCHEME=$(xcodebuild -list -json | node -e "const d=JSON.parse(require('fs').readFileSync(0));console.log(d.project.schemes[0])")
+          echo "name=$SCHEME" >> "$GITHUB_OUTPUT"
+
+      - name: Archive (unsigned)
+        run: |
+          cd ios
+          xcodebuild archive \
+            -workspace *.xcworkspace \
+            -scheme "${{ steps.scheme.outputs.name }}" \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath build/App.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES
+
+      - name: Package unsigned ipa
+        run: |
+          cd ios/build
+          mkdir Payload
+          cp -r App.xcarchive/Products/Applications/*.app Payload/
+          zip -r FitApp-unsigned.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FitApp-unsigned-ipa
+          path: ios/build/FitApp-unsigned.ipa

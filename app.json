@@ -1,13 +1,17 @@
 {
   "expo": {
     "name": "FitApp",
-    "slug": "FitApp",
+    "slug": "johan725",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.johan.fitapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,6 +23,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2a6b729e-b808-49f1-919a-934d901cbf27"
+      }
+    },
+    "owner": "latino-speak"
   }
 }
